@@ -4,6 +4,15 @@ This piece of software is meant to run on the "nodes" of the CDM (Crowd Density 
 
 ## Setup
 
+### 1. Step
+Remember to install python 3 (Preferably version 3.10 or higher) and give the setup script _setup.sh_ the appropriate permissions (`chmod +x setup.sh`).
+
+Compile the protocol buffer by running the following script:
+```bash
+./setup.sh
+```
+
+Install the following packages:
 ```bash
 sudo apt install python3-numpy python3-scipy python3-scapy
 ```
