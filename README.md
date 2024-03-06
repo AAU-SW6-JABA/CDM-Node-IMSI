@@ -4,11 +4,15 @@ This piece of software is meant to run on the "nodes" of the CDM (Crowd Density 
 
 ## Setup
 
-Compile the protocol buffer by running the following:
+### 1. Step
+Remember to install python 3 (Preferably version 3.10 or higher) and give the setup script _setup.sh_ the appropriate permissions (`chmod +x setup.sh`).
+
+Compile the protocol buffer by running the following script:
 ```bash
-pip install grpcio-tools && python3 -m grpc_tools.protoc -I CDM-ProtocolBuffer --python_out=common/grpc --pyi_out=common/grpc --grpc_python_out=common/grpc CDM-ProtocolBuffer/route_guide.proto
+./setup.sh
 ```
 
+Install the following packages:
 ```bash
 sudo apt install python3-numpy python3-scipy python3-scapy
 ```
