@@ -1,0 +1,3 @@
+[submodule "CDM-ProtocolBuffer"]
+	path = CDM-ProtocolBuffer
+	url = https://github.com/AAU-SW6-JABA/CDM-ProtocolBuffer
