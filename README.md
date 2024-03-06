@@ -4,6 +4,11 @@ This piece of software is meant to run on the "nodes" of the CDM (Crowd Density 
 
 ## Setup
 
+Compile the protocol buffer by running the following:
+```bash
+pip install grpcio-tools && python3 -m grpc_tools.protoc -I CDM-ProtocolBuffer --python_out=common/grpc --pyi_out=common/grpc --grpc_python_out=common/grpc CDM-ProtocolBuffer/route_guide.proto
+```
+
 ```bash
 sudo apt install python3-numpy python3-scipy python3-scapy
 ```
