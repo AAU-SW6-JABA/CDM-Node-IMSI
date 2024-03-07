@@ -84,7 +84,7 @@ Run all `grgsm_*` in this docker.
 We use `grgsm_livemon` to decode GSM signals and `simple_IMSI-catcher.py` to find IMSIs.
 
 ```bash
-python3 simple_IMSI-catcher.py -h
+python3 main.py -h
 ```
 
 ```
@@ -112,7 +112,7 @@ Open 2 terminals.
 In terminal 1
 
 ```bash
-sudo python3 simple_IMSI-catcher.py -s
+sudo python3 main.py -s
 ```
 
 In terminal 2
@@ -184,7 +184,7 @@ python3 scan-and-livemon
 In terminal 2
 
 ```bash
-python3 simple_IMSI-catcher.py
+python3 main.py
 ```
 
 # Links

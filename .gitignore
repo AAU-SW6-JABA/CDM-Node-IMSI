@@ -30,6 +30,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
@@ -183,3 +184,8 @@ venv
 .env
 test*
 .idea
+
+# grpc files
+route_guide_pb2.py
+route_guide_pb2.pyi
+route_guide_pb2_grpc.py
