@@ -17,7 +17,7 @@ RUN cd gr-gsm && mkdir build && cd build && cmake .. && make && make install && 
 # IMSI-catcher script
 RUN apt-get install -y python-numpy python-scipy python-scapy
 
-ADD . /imsi-catcher/
+ADD .. /imsi-catcher/
 
 # Wireshark
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get install -y wireshark tshark
