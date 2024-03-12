@@ -3,7 +3,7 @@ import time
 
 from route_guide_pb2_grpc import RoutesStub
 from route_guide_pb2 import LogMeasurementRequest
-from .grpc_server import GrpcRequests
+from .grpc_routes import GrpcRoutes
 
 
 class Tracker:
@@ -181,7 +181,7 @@ class Tracker:
             timestamp=time.time(),
             signal_strength=signal_dbm)
 
-        GrpcRequests.log_measurement(self.stub, grpc_message)
+        GrpcRoutes.log_measurement(self.stub, grpc_message)
 
     def imsi_purge_old(self):
         now = datetime.datetime.utcnow().replace(microsecond=0)

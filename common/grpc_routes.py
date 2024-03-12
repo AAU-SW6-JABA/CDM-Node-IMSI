@@ -6,7 +6,7 @@ from route_guide_pb2_grpc import RoutesStub
 from route_guide_pb2 import RegisterAntennaRequest, RegisterAntennaResponse, LogMeasurementRequest
 
 
-class GrpcRequests:
+class GrpcRoutes:
     @staticmethod
     def register_antenna(stub: RoutesStub, x: int, y: int) -> int:
         response = stub.RegisterAntennaRoute(RegisterAntennaRequest(x=x, y=y))
