@@ -12,6 +12,8 @@ import grpc
 from common.imsi_sniffer import IMSISniffer
 from route_guide_pb2_grpc import RoutesStub
 
+from common.grpc_routes import GrpcRoutes
+
 
 async def main() -> None:
     parser = OptionParser(usage="%prog: [options]")
@@ -28,14 +30,16 @@ async def main() -> None:
 
     async with grpc.aio.insecure_channel(address) as channel:
         stub = RoutesStub(channel)
-        imsi_sniffer = IMSISniffer(stub)
+        for i in range(10000):
+            await GrpcRoutes.register_antenna(stub, 4, 4)
+        #imsi_sniffer = IMSISniffer(stub)
 
-        if options.sniff:
-            sniff(iface=options.iface, filter=f"port {options.port} and not icmp and udp",
-                  prn=imsi_sniffer.find_imsi_from_pkt,
-                  store=0)
-        else:
-            imsi_sniffer.udpserver(port=options.port)
+        #if options.sniff:
+        #    sniff(iface=options.iface, filter=f"port {options.port} and not icmp and udp",
+        #          prn=imsi_sniffer.find_imsi_from_pkt,
+        #          store=0)
+        #else:
+        #    imsi_sniffer.udpserver(port=options.port)
 
 
 if __name__ == "__main__":

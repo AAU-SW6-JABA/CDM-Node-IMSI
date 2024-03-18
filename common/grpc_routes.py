@@ -8,8 +8,8 @@ from route_guide_pb2 import RegisterAntennaRequest, RegisterAntennaResponse, Log
 
 class GrpcRoutes:
     @staticmethod
-    def register_antenna(stub: RoutesStub, x: int, y: int) -> int:
-        response = stub.RegisterAntennaRoute(RegisterAntennaRequest(x=x, y=y))
+    async def register_antenna(stub: RoutesStub, x: int, y: int) -> int:
+        response = await stub.RegisterAntennaRoute(RegisterAntennaRequest(x=x, y=y))
 
         if type(response) is not RegisterAntennaResponse:
             logging.exception("Failed to register antenna")
