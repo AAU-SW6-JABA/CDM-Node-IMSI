@@ -1,8 +1,8 @@
 import datetime
 import time
 
-from route_guide_pb2_grpc import RoutesStub
-from route_guide_pb2 import LogMeasurementRequest
+from cdm_protobuf_pb2_grpc import RoutesStub
+from cdm_protobuf_pb2 import LogMeasurementRequest
 from .grpc_routes import GrpcRoutes
 
 

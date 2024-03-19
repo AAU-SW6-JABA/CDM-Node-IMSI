@@ -2,14 +2,14 @@ import asyncio
 import logging
 
 import grpc
-from route_guide_pb2_grpc import RoutesStub
-from route_guide_pb2 import RegisterAntennaRequest, RegisterAntennaResponse, LogMeasurementRequest
+from cdm_protobuf_pb2_grpc import RoutesStub
+from cdm_protobuf_pb2 import RegisterAntennaRequest, RegisterAntennaResponse, LogMeasurementRequest
 
 
 class GrpcRoutes:
     @staticmethod
-    def register_antenna(stub: RoutesStub, x: int, y: int) -> int:
-        response = stub.RegisterAntennaRoute(RegisterAntennaRequest(x=x, y=y))
+    async def register_antenna(stub: RoutesStub, x: float, y: float) -> int:
+        response = await stub.RegisterAntennaRoute(RegisterAntennaRequest(x=x, y=y))
 
         if type(response) is not RegisterAntennaResponse:
             logging.exception("Failed to register antenna")
@@ -20,5 +20,5 @@ class GrpcRoutes:
             return typed_response.aid
 
     @staticmethod
-    async def log_measurement(self, stub: RoutesStub, measurement: LogMeasurementRequest) -> None:
+    async def log_measurement(stub: RoutesStub, measurement: LogMeasurementRequest) -> None:
         await stub.LogMeasurementRoute(measurement)

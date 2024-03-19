@@ -3,19 +3,14 @@ from scapy.layers.inet import UDP
 from common.gsmtaphdr import GsmtapHdr
 
 from common.tracker import Tracker
-from common.grpc_routes import GrpcRoutes
-from route_guide_pb2_grpc import RoutesStub
+from cdm_protobuf_pb2_grpc import RoutesStub
 
 
 class IMSISniffer:
     imsitracker: Tracker
     antenna_id: int
 
-    def __init__(self, stub: RoutesStub):
-        antenna_id = GrpcRoutes.register_antenna(stub, 0, 0)
-        if antenna_id < 0:
-            raise Exception("Failed to register antenna")
-
+    def __init__(self, stub: RoutesStub, antenna_id: int):
         self.imsitracker = Tracker(stub, antenna_id)
         self.imsitracker.header()
 
