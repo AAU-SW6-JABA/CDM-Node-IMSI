@@ -10,7 +10,9 @@ import logging
 import grpc
 
 from common.imsi_sniffer import IMSISniffer
-from route_guide_pb2_grpc import RoutesStub
+from common.grpc_routes import GrpcRoutes
+
+from cdm_protobuf_pb2_grpc import RoutesStub
 
 
 async def main() -> None:
@@ -22,13 +24,21 @@ async def main() -> None:
     (options, args) = parser.parse_args()
 
     address: str = os.getenv("GRPC_SERVER_ADDRESS")
+    x_coordinate: float = float(os.getenv("LOCATION_X"))
+    y_coordinate: float = float(os.getenv("LOCATION_Y"))
 
     if not address:
         raise Exception("Failed to load address")
 
     async with grpc.aio.insecure_channel(address) as channel:
         stub = RoutesStub(channel)
-        imsi_sniffer = IMSISniffer(stub)
+
+        # Registering antenna
+        antenna_id: int = await GrpcRoutes.register_antenna(stub, x_coordinate, y_coordinate)
+        if antenna_id < 0:
+            raise Exception("Failed to register antenna")
+
+        imsi_sniffer = IMSISniffer(stub, antenna_id)
 
         if options.sniff:
             sniff(iface=options.iface, filter=f"port {options.port} and not icmp and udp",

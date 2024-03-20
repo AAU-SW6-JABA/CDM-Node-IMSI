@@ -186,6 +186,6 @@ test*
 .idea
 
 # grpc files
-route_guide_pb2.py
-route_guide_pb2.pyi
-route_guide_pb2_grpc.py
+cdm_protobuf_pb2.py
+cdm_protobuf_pb2.pyi
+cdm_protobuf_pb2_grpc.py

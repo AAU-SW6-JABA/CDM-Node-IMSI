@@ -1,6 +1,5 @@
 import ctypes
 
-
 class GsmtapHdr(ctypes.BigEndianStructure):
     _pack_ = 1
     # Based on gsmtap_hdr structure in <grgsm/gsmtap.h> from gr-gsm

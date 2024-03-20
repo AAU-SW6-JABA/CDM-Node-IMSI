@@ -1,8 +1,9 @@
 import datetime
 import time
+from hashlib import sha256
 
-from route_guide_pb2_grpc import RoutesStub
-from route_guide_pb2 import LogMeasurementRequest
+from cdm_protobuf_pb2_grpc import RoutesStub
+from cdm_protobuf_pb2 import LogMeasurementRequest
 from .grpc_routes import GrpcRoutes
 
 
@@ -174,10 +175,12 @@ class Tracker:
             }
         self.imsi_purge_old()
 
+        hashedImsi: str = sha256(imsi.encode('utf-8')).hexdigest()
+
         # Create grpc message and
         grpc_message = LogMeasurementRequest(
             aid=self.antenna_id,
-            imsi=imsi,
+            identifier=hashedImsi,
             timestamp=time.time(),
             signal_strength=signal_dbm)
 
