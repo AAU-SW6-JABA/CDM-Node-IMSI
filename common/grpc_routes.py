@@ -23,4 +23,3 @@ class GrpcRoutes:
 
         if type(response) is not Empty:
             logging.exception("Failed to register antenna")
-
