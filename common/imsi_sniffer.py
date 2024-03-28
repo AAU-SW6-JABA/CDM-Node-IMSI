@@ -1,18 +1,33 @@
 import socket
+import struct
+from threading import Thread
 from scapy.layers.inet import UDP
+from scapy.all import sniff
 from common.gsmtaphdr import GsmtapHdr
 
 from common.tracker import Tracker
-from cdm_protobuf_pb2_grpc import RoutesStub
+from queue import Queue
 
 
-class IMSISniffer:
+class IMSISniffer(Thread):
     imsitracker: Tracker
     antenna_id: int
 
-    def __init__(self, stub: RoutesStub, antenna_id: int):
-        self.imsitracker = Tracker(stub, antenna_id)
+    port: int
+    iface: str
+
+
+    def __init__(self, messageQueue: Queue, port: int, iface: str):
+        Thread.__init__(self)
+        self.port = port
+        self.iface = iface
+        self.imsitracker = Tracker(messageQueue)
         self.imsitracker.header()
+
+    def run(self):
+        sniff(iface=self.iface, filter=f"port {self.port} and not icmp and udp",
+                prn=self.find_imsi_from_pkt,
+                store=0)
 
     # return mcc mnc, lac, cell, country, brand, operator
     def find_cell(self, gsm, udpdata, t=None):

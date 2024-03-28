@@ -1,13 +1,13 @@
+import asyncio
 import datetime
 import time
 from hashlib import sha256
 
-from cdm_protobuf_pb2_grpc import RoutesStub
-from cdm_protobuf_pb2 import LogMeasurementRequest
-from .grpc_routes import GrpcRoutes
+from common.Message import Message
+from queue import Queue
 
 
-class Tracker:
+class Tracker():
     imsistate = {}
     # Phones
     imsis = []  # [IMSI,...]
@@ -25,20 +25,18 @@ class Tracker:
     # in minutes
     purgeTimer = 10  # default 10 min
 
-    mcc_codes = None
+    mcc_codes = []
     sqlite_con = None
     mysql_con = None
     mysql_cur = None
     textfilePath = None
     output_function = None
 
-    stub: RoutesStub
-    antenna_id: int
+    messageQueue: Queue
 
-    def __init__(self, stub: RoutesStub, antenna_id: int):
+    def __init__(self, messageQueue: Queue):
         self.output_function = self.output
-        self.stub = stub
-        self.antenna_id = antenna_id
+        self.messageQueue = messageQueue
 
     def set_output_function(self, new_output_function):
         # New output function need this field :
@@ -58,6 +56,19 @@ class Tracker:
             return new_tmsi
         else:
             return ""
+
+    def decode_imsi(self, imsi):
+        new_imsi = ''
+        for a in imsi:
+            c = hex(a)
+            if len(c) == 4:
+                new_imsi += str(c[3]) + str(c[2])
+            else:
+                new_imsi += str(c[2]) + "0"
+
+        mcc = new_imsi[1:4]
+        mnc = new_imsi[4:6]
+        return new_imsi, mcc, mnc
 
     def current_cell(self, mcc, mnc, lac, cell):
         brand = ""
@@ -79,7 +90,7 @@ class Tracker:
 
     def output(self, cpt, tmsi1, tmsi2, imsi, mcc, mnc, lac, cell, now, signal):
         print(
-            f"{str(cpt):7s} ; {str(tmsi1):10s} ; {str(tmsi2):10s} ; {str(imsi):17s} ; {str(mcc):4s} ; {str(mnc):5s} ; {str(lac):6s} ; {str(cell):6s} ; {now.isoformat():s} ; {now.isoformat():s} ; {str(signal):s}")
+            f"{str(cpt):7s} ; {str(tmsi1):10s} ; {str(tmsi2):10s} ; {str(imsi):17s} ; {str(lac):6s} ; {str(cell):6s} ; {now.strftime('%H:%M:%S'):s} ; {str(signal):s}")
 
     def pfields(self, cpt, tmsi1, tmsi2, imsi, mcc, mnc, lac, cell, signal):
         if imsi:
@@ -91,7 +102,7 @@ class Tracker:
 
     def header(self):
         print(
-            f"{'Nb IMSI':7s} ; {'TMSI-1':10s} ; {'TMSI-2':10s} ; {'IMSI':17s} ; {'MCC':4s} ; {'MNC':5s} ; {'LAC':6s} ; {'CellId':6s} ; {'Timestamp':s} ; {'Signal_db':s}")
+            f"{'Nb IMSI':7s} ; {'TMSI-1':10s} ; {'TMSI-2':10s} ; {'IMSI':17s} ; {'LAC':6s} ; {'CellId':6s} ; {'Timestamp':s} ; {'Signal_db':s}")
 
     # TODO: Add relevant code (Only the signal has been added)
     def register_imsi(self, arfcn, signal_dbm, imsi1="", imsi2="", tmsi1="", tmsi2=""):
@@ -119,7 +130,7 @@ class Tracker:
                 self.pfields(str(self.nb_IMSI),
                              tmsi1,
                              tmsi2,
-                             imsi1,
+                             self.decode_imsi(imsi1)[0],
                              self.mcc,
                              self.mnc,
                              self.lac,
@@ -129,7 +140,7 @@ class Tracker:
                 self.pfields(str(self.nb_IMSI),
                              tmsi1,
                              tmsi2,
-                             imsi2,
+                             self.decode_imsi(imsi2)[0],
                              self.mcc,
                              self.mnc,
                              self.lac,
@@ -144,26 +155,29 @@ class Tracker:
     def register_identifier(self, arfcn, imsi: str, tmsi1: str, tmsi2: str, signal_dbm) -> bool:
         registered_new: bool = False
 
-        if imsi:
-            self.imsi_seen(imsi, arfcn, signal_dbm)
-            if imsi not in self.imsis:
+        imsi_decoded, mcc, mnc = self.decode_imsi(imsi)
+
+        if imsi_decoded:
+            self.imsi_seen(imsi_decoded, arfcn, signal_dbm)
+            if imsi_decoded not in self.imsis:
                 # new IMSI
-                self.imsis.append(imsi)
+                self.imsis.append(imsi_decoded)
                 self.nb_IMSI += 1
                 registered_new = True
-            if self.tmsis and tmsi1 and (tmsi1 not in self.tmsis or self.tmsis[tmsi1] != imsi):
+            if self.tmsis and tmsi1 and (tmsi1 not in self.tmsis or self.tmsis[tmsi1] != imsi_decoded):
                 # new TMSI to an ISMI
-                self.tmsis[tmsi1] = imsi
+                self.tmsis[tmsi1] = imsi_decoded
                 registered_new = True
-            if self.tmsis and tmsi2 and (tmsi2 not in self.tmsis or self.tmsis[tmsi2] != imsi):
+            if self.tmsis and tmsi2 and (tmsi2 not in self.tmsis or self.tmsis[tmsi2] != imsi_decoded):
                 # new TMSI to an ISMI
-                self.tmsis[tmsi2] = imsi
+                self.tmsis[tmsi2] = imsi_decoded
                 registered_new = True
 
         return registered_new
 
     def imsi_seen(self, imsi, arfcn, signal_dbm):
         now = datetime.datetime.utcnow().replace(microsecond=0)
+        
         if imsi in self.imsistate:
             self.imsistate[imsi]["lastseen"] = now
         else:
@@ -178,13 +192,12 @@ class Tracker:
         hashedImsi: str = sha256(imsi.encode('utf-8')).hexdigest()
 
         # Create grpc message and
-        grpc_message = LogMeasurementRequest(
-            aid=self.antenna_id,
+        grpc_message = Message(
             identifier=hashedImsi,
             timestamp=time.time(),
             signal_strength=signal_dbm)
-
-        GrpcRoutes.log_measurement(self.stub, grpc_message)
+        
+        self.messageQueue.put(grpc_message)
 
     def imsi_purge_old(self):
         now = datetime.datetime.utcnow().replace(microsecond=0)
