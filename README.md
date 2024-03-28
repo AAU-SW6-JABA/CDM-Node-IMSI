@@ -5,15 +5,19 @@ This piece of software is meant to run on the "nodes" of the CDM (Crowd Density 
 ## Setup
 
 ### 1. Step
+
 Run the following terminal command to setup the project:
+
 ```bash
 make setup
 ```
 
 To run the project run the following
+
 ```bash
 make run
 ```
+
 # THE FOLLOWING README IS FOR THE OLD PROJECT PARTS
 
 Warning : don't use python 3.9 (ctypes bug)!

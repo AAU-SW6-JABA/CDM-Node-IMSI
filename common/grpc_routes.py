@@ -66,5 +66,3 @@ class GrpcRoutes():
                 logging.warning("WARNING: Server sent unrecognizable response")
         except:
             logging.warning("ERROR: Failed to send measurement. Server not responding")
-
-        
