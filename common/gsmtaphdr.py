@@ -4,18 +4,18 @@ class GsmtapHdr(ctypes.BigEndianStructure):
     _pack_ = 1
     # Based on gsmtap_hdr structure in <grgsm/gsmtap.h> from gr-gsm
     _fields_ = [
-        ("version", ctypes.c_ubyte),
-        ("hdr_len", ctypes.c_ubyte),
-        ("type", ctypes.c_ubyte),
-        ("timeslot", ctypes.c_ubyte),
+        ("version", ctypes.c_uint8),
+        ("hdr_len", ctypes.c_uint8),
+        ("type", ctypes.c_uint8),
+        ("timeslot", ctypes.c_uint8),
         ("arfcn", ctypes.c_uint16),
-        ("signal_dbm", ctypes.c_ubyte),
-        ("snr_db", ctypes.c_ubyte),
+        ("signal_dbm", ctypes.c_int8),
+        ("snr_db", ctypes.c_int8),
         ("frame_number", ctypes.c_uint32),
-        ("sub_type", ctypes.c_ubyte),
-        ("antenna_nr", ctypes.c_ubyte),
-        ("sub_slot", ctypes.c_ubyte),
-        ("res", ctypes.c_ubyte),
+        ("sub_type", ctypes.c_uint8),
+        ("antenna_nr", ctypes.c_uint8),
+        ("sub_slot", ctypes.c_uint8),
+        ("res", ctypes.c_uint8),
     ]
 
     def __repr__(self):
