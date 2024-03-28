@@ -178,22 +178,22 @@ class Tracker():
     def imsi_seen(self, imsi, arfcn, signal_dbm):
         now = datetime.datetime.utcnow().replace(microsecond=0)
         
-        #if imsi in self.imsistate:
-        #    self.imsistate[imsi]["lastseen"] = now
-        #else:
-        #    self.imsistate[imsi] = {
-        #        "firstseen": now,
-        #        "lastseen": now,
-        #        "imsi": imsi,
-        #        "arfcn": arfcn,
-        #    }
-        #self.imsi_purge_old()
+        if imsi in self.imsistate:
+            self.imsistate[imsi]["lastseen"] = now
+        else:
+            self.imsistate[imsi] = {
+                "firstseen": now,
+                "lastseen": now,
+                "imsi": imsi,
+                "arfcn": arfcn,
+            }
+        self.imsi_purge_old()
 
         hashedImsi: str = sha256(imsi.encode('utf-8')).hexdigest()
 
         # Create grpc message and
         grpc_message = Message(
-            identifier=imsi,
+            identifier=hashedImsi,
             timestamp=time.time(),
             signal_strength=signal_dbm)
         
