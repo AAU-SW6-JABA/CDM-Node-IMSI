@@ -1,6 +1,10 @@
 # Crowd-Density-Monitoring: IMSI-sniffer
 
-This piece of software is meant to run on the "nodes" of the CDM (Crowd Density Monitoring) system. It'
+This piece of software is meant to run on the "nodes" of the CDM (Crowd Density Monitoring) system.
+
+## Legal disclaimer
+
+This code was initially forked from [Oros42/IMSI-catcher](https://github.com/Oros42/IMSI-catcher). We have made significant changes to the code to specialize it for our use case.
 
 ## Setup
 
